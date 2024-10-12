@@ -1,0 +1,483 @@
+%title vimwiki-语法
+%toc   vimwiki-语法
+
+= 原文档 =
+
+`https://github.com/Jade-Shan/vimwiki/blob/master/doc/vimwiki.txt`
+
+= 1. 简介 =
+
+Vimwiki 是一个 Vim 中的个人 wiki -- 一个有它自己的高亮语法和链接的文本文件。
+
+使用 vimwiki 你可以：
+
+  - 组织笔记和想法
+  - 管理待办事项列表
+  - 写文档
+  - 写日记
+  - 导出HTML文件
+
+
+
+= 2. 先决条件配置 =
+
+如果`.vimrc`文件中没有如下的设置，Vimwiki 将不能正常工作：
+
+{{{
+set nocompatible
+filetype plugin on
+syntax on
+}}}
+
+
+
+= 3. 映射 =
+
+== 3.1. 全局映射 ==
+
+{{{
+[n]\ww or :VimwikiIndex	--- 打开第n个wiki（默认g:vimwiki_list中的第一个）
+[n]\wt or :VimwikiTabIndex	--- 新标签中打开第n个wiki（默认打开g:vimwiki_list中的第一个）
+\ws or :VimwikiUISelect	--- 列出所有wiki项目，选择序号打开相应wiki
+[n]\wi or :VimwikiDiaryIndex	--- 打开第n个wiki日记索引（默认g:vimwiki_list中的第一个）
+[n]\w\w or :VimwikiMakeDiaryNote	--- 打开第n个wiki当日日记（默认g:vimwiki_list中的第一个）
+[n]\w\t or :VimwikiTabMakeDiaryNote	--- 新标签中打开第n个wiki当日日记（默认打开g:vimwiki_list中的第一个）
+[n]\w\y or :VimwikiMakeYesterdayDiaryNote	--- 打开第n个wiki昨天日记（默认g:vimwiki_list中的第一个）
+}}}
+
+
+== 3.2. 局部映射 ==
+
+可以在`.vimrc`文件中重新定义映射：
+
+{{{
+:nmap <Leader>wc <Plug>Vimwiki2HTML
+}}}
+
+
+或者在`.vim/ftplugin/vimwiki.vim`重定义：
+
+{{{
+:nmap <silent><buffer> <Leader>wc <Plug>Vimwiki2HTML
+}}}
+
+后者的优点是重定义的映射只对vimwiki有效。
+
+=== 3.2.1. Normal模式: ===
+
+{{{
+\wh or :Vimwiki2HTML	--- 当前wiki文件转化成HTML文件
+\whh or :Vimwiki2HTMLBrowse	--- 当前wiki文件转化成HTML文件
+\w\i or :VimwikiDiaryGenerateLinks	--- 更新日记索引(只在日记索引文件中有效)
+<CR> or :VimwikiFollowLink	--- 创建/追踪wiki链接
+<S-CR> or :VimwikiSplitLink	--- 水平分割窗口创建/追踪wiki链接(有些终端中无效，需重映射)
+<C-CR> or :VimwikiVSplitLink	--- 垂直分割窗口创建/追踪wiki链接(有些终端中无效，需重映射)
+<C-S-CR>,<D-CR> or :VimwikiTabnewLink	--- 新标签中创建/追踪wiki链接(有些终端中无效，需重映射)
+<Backspace> or :VimwikiGoBackLink	--- 返回上层wiki
+<Tab> or :VimwikiNextLink	--- 跳转到当前wiki文件下一个链接
+<S-Tab> or :VimwikiPrevLink	--- 跳转到当前wiki文件上一个链接
+\wd or :VimwikiDeleteLink	--- 删除当前wiki文件
+\wr or :VimwikiRenameLink	--- 重命名当前wiki文件
+= or :VimwikiAddHeaderLevel	--- 增加标题等级
+- or :VimwikiRemoveHeaderLevel	--- 减小标题等级
++ or :VimwikiNormalizeLink:VimwikiNormalizeLink	--- 创建链接/增加链接描述
+<C-Space> or :VimwikiToggleListItem	--- List项目中复选框选中开关，项目没有复选框时则添加复选框(一般在TODO List中)
+gl<Space> or :VimwikiRemoveSingleCB	--- 去除List项目中复选框
+gL<Space> or :VimwikiRemoveCBInList	--- 去除List所有同级项目复选框
+glx or :VimwikiToggleRejectedListItem	--- 关闭List项目复选框[✘]
+gln or :VimwikiIncrementListItem	--- 增加List项目复选框完成进度标志[ ][.][o][O][✔]
+glp or :VimwikiDecrementListItem	--- 降低List项目复选框完成进度标志[ ][.][o][O][✔]
+gll or :VimwikiIncreaseLvlSingleItem	--- 增加List项目等级
+gLl or :VimwikiIncreaseLvlWholeItem	--- 增加List项目及其子项目等级
+glh or :VimwikiDecreaseLvlSingleItem	--- 降低List项目等级
+gLh or :VimwikiDecreaseLvlWholeItem	--- 降低List项目及其子项目等级
+glr or :VimwikiRenumberList	--- List项目重新编号
+gLr or :VimwikiRenumberAllLists	--- List项目及其子项目重新编号
+gl* or :VimwikiChangeSymbolTo *	--- 普通行变成*List项目*List项目变成普通行(会和vim中的搜索快捷键*冲突)
+gL* or :VimwikiChangeSymbolInListTo *	--- List项目标识变成*
+gl# or :VimwikiChangeSymbolTo #	--- 普通行变成#List项目#List项目变成普通行
+gL# or :VimwikiChangeSymbolInListTo #	--- List项目标识变成#
+gl- or :VimwikiChangeSymbolTo -	--- 普通行变成-List项目-List项目变成普通行
+gL- or :VimwikiChangeSymbolInListTo -	--- List项目标识变成-
+gl1 or :VimwikiChangeSymbolTo 1	--- 普通行变成1.2.3.List项目1.2.3.List项目变成普通行
+gL1 or :VimwikiChangeSymbolInListTo 1	--- List项目标识变成1.2.3.
+gla or :VimwikiChangeSymbolTo a	--- 普通行变成a)b)c)List项目a)b)c)List项目变成普通行
+gLa or :VimwikiChangeSymbolInListTo a	--- List项目标识变成a)b)c)
+glA or :VimwikiChangeSymbolTo A	--- 普通行变成a)b)c)List项目A)B)C)List项目变成普通行
+gLA or :VimwikiChangeSymbolInListTo A	--- List项目标识变成A)B)C)
+gli or :VimwikiChangeSymbolTo i	--- 普通行变成i)ii)iii)List项目i)ii)iii)List项目变成普通行
+gLi or :VimwikiChangeSymbolInListTo i	--- List项目标识变成i)ii)iii)
+glI or :VimwikiChangeSymbolTo I	--- 普通行变成I)II)III)List项目I)II)III)List项目变成普通行
+gLI or :VimwikiChangeSymbolInListTo I	--- List项目标识变成I)II)III)
+gqq/gww :VimwikiChangeSymbolInListTo	--- 表格格式化
+<A-Left> :VimwikiTableMoveColumnLeft	--- 表格当前列移到左边
+<A-Right> :VimwikiTableMoveColumnRight	--- 表格当前列移到左边
+<C-Up> :VimwikiDiaryPrevDay	--- 打开已经存在的上一天的日记
+<C-Down> :VimwikiDiaryNextDay	--- 打开已经存在的下一天的日记
+
+<2-LeftMouse>	--- 创建/追踪wiki链接(即双击左键 g:vimwiki_use_mouse=1)
+<S-2-LeftMouse>	--- 水平窗口创建/追踪wiki链接(g:vimwiki_use_mouse=1)
+<C-2-LeftMouse>	--- 垂直窗口创建/追踪wiki链接(g:vimwiki_use_mouse=1)
+<RightMouse><LeftMouse>	--- 返回上层wiki(g:vimwiki_use_mouse=1)
+}}}
+
+
+=== 3.2.2. Insert模式: ===
+
+{{{
+<CR>	--- 跳到表格的下一行单元格，到达末尾时会新建一行
+<Tab>	--- 跳到表格的下一个临近单元格，到达末尾时会新建一行
+
+<CR>	--- 光标在非空List项目中时，跳到下一行并新建项目；光标在空List项目时，一直按回车知道项目标识消失，一般用来结束列表
+<S-CR>	--- 禁止自动生成列表项目，用于创建多行列表项
+<C-T> or :VimwikiIncreaseLvlSingleItem	--- 增加List项目等级
+<C-D> or :VimwikiDecreaseLvlSingleItem	--- 降低List项目等级
+<C-L><C-J> or :VimwikiListNextSymbol	--- 切换下一个List项目标识(-,1,*,I),a))
+<C-L><C-K> or :VimwikiListPrevSymbol	--- 切换上一个List项目标识(-,a),I),*,1)
+<C-L><C-M> or :VimwikiListToggle	--- 删除/添加List项目标识
+}}}
+
+
+== 3.3. 文本对象 ==
+
+{{{
+ah	两标题之间的内容，包含标题和末尾空行
+ih	两标题之间的内容，包含标题和不包含末尾空行
+
+a\	表格中的一个单元格，包含两边的|
+i\	表格中的一个单元格，不包含两边的|
+ac	表格中的一列，包含两边的|
+ic	表格中的一列，不包含两边的|
+
+al	列表中的一个项目，及其子项目
+il	列表中的一个项目
+}}}
+
+用法：
+
+{{{
+	vah 选中两标题之间的内容，包含标题和末尾空行
+	dah 删除两标题之间的内容，包含标题和末尾空行
+	yah 复制两标题之间的内容，包含标题和末尾空行
+	cah 修改两标题之间的内容，包含标题和末尾空行(效果同dah后进入Insert模式)
+}}}
+
+
+
+= 4. 命令 =
+
+== 4.1. 全局命令 ==
+
+{{{
+:VimwikiIndex	--- 打开当前wiki的索引文件
+:VimwikiTabIndex	--- 新标签中打开当前wiki的索引文件 
+:VimwikiUISelect	--- 通过wiki列表打开选中的wiki
+:VimwikiDiaryIndex	--- 打开当前wiki的日记索引文件
+:VimwikiMakeDiaryNote	--- 打开当前wiki的当天日记
+:VimwikiTabMakeDiaryNote	--- 新标签中打开当前wiki的当天日记
+:VimwikiMakeYesterdayDiaryNote	--- 打开当前wiki的昨天日记
+}}}
+
+
+== 4.2. 局部命令 ==
+
+{{{
+:VimwikiFollowLink	--- 跟踪/创建链接
+:VimwikiGoBackLink	--- 返回上层wiki文件
+:VimwikiSplitLink	--- 水平分割窗口跟踪/创建链接
+:VimwikiVSplitLink	--- 垂直分割窗口跟踪/创建链接
+:VimwikiTabnewLink	--- 新标签中跟踪/创建链接
+:VimwikiNextLink	--- 查找当前页下一个链接
+:VimwikiPrevLink	--- 查找当前页上一个链接
+:VimwikiGoto linename	--- 跳转到/创建指定链接
+:VimwikiDeleteLink	--- 删除当前wiki文件
+:VimwikiRenameLink	--- 重命名当前wiki文件
+:Vimwiki2HTML		--- 当前wiki文件转化成HTML，支持用户自定义转化脚本(参见vimwiki-option-custom_wiki2html)
+:Vimwiki2HTMLBrowse	--- 当前wiki文件转化成HTML，并在浏览器中打开
+:VimwikiAll2HTML	--- 所有wiki文件转化成HTML
+:VimwikiToggleListItem	--- List项目中复选框选中开关，项目没有复选框时则添加复选框(一般在TODO List中)
+:VimwikiToggleRejectedListItem	--- 关闭List项目复选框[✘]
+:VimwikiListChangeLevel CMD	--- 改变单行列表项目的嵌套等级(CMD是>>,<<)或者项目标识(CMD是*,#,1,-)
+:VimwikiSearch,:VWS /pattern/	--- 当前wiki的所有文件中搜索，使用:lopen :lnext :lprevious查看结果 
+:VimwikiBacklinks,:VWB	--- 当前wiki的所有文件中搜索链接，使用:lopen :lnext :lprevious查看结果 
+:VimwikiTable [cols] [rows]	--- 创建表格(默认2行5列)
+:VimwikiTableMoveColumnLeft,:VimwikiTableMoveColumnRight	--- 左右移动列表的一列
+:VimwikiGenerateLinks	--- 插入所有wiki文件的链接到当前缓冲区(TODO)
+:VimwikiDiaryGenerateLinks	--- 更新日记索引(只在日记索引文件中有效)
+:VimwikiDiaryNextDay	--- 打开已经存在的下一天的日记
+:VimwikiDiaryPrevDay	--- 打开已经存在的上一天的日记
+:VimwikiTOC	--- 创建或更新当前的wiki文件的目录
+:VimwikiCheckLinks	--- 搜索所有wiki文件,检查链接的目标文件以及外部链接文件是否确实存在.并检查索引文件到所有的wiki文件是否可达，并在quickfix窗口中显示结果
+:VimwikiRebuildTags	--- 重建所有更新wiki文件的标签属性文件(TODO)
+:VimwikiRebuildTags!	--- 同VimwikiRebuildTags(TODO)
+:VimwikiSearchTags	---在当前wiki的页面中查找给定标签的所有位置(TODO)
+:VimwikiGenerateTags tagname1 tagname2 ...	--- 创建/更新指向示例对象的所有标签的预览（无参数，则输出所有标签，参见vimwiki-build-tags）
+}}}
+
+
+== 4.3. 函数 ==
+
+与vimwiki交互的函数(把大部分命令用函数替换，将是未来的发展趋势)
+
+提示：该部分尚不稳定，以后极有可能得到改善
+
+键映射定义用法：
+
+{{{
+nnoremap <C-K> :call vimwiki#base#function_name(arg1, arg2)<CR>
+}}}
+
+例如追踪链接的函数:
+
+{{{
+vimwiki#base#follow_link({split}, {reuse}, {move_cursor})
+}}}
+
+参数`{split}`可以有以下值:
+
+{{{
+	'nosplit'       当前窗口打开链接
+	'vsplit'        垂直窗口打开链接
+	'hsplit'        水平窗口打开链接
+	'tab'           新标签中打开链接
+}}}
+
+	
+参数`{reuse}=1`，而且`{split}='vsplit'`或者`{split}='hsplit'`时，
+将会在一个可能已经存在的分割窗口中打开链接，而不是新建一个分割窗口
+
+参数`{move_cursor}=1`，则光标移到打开链接的窗口，否则不会移动
+
+例如`<CR>`快捷键的映射
+
+{{{
+nnoremap <CR> :call vimwiki#base#follow_link('nosplit', 0, 1)<CR>
+}}}
+
+
+= 5. Wiki 语法 =
+
+== 5.1. 字体 ==
+
+{{{
+*粗体文本*
+_斜体文本_
+~~删除线~~
+`代码`
+文本^上角标^
+文本,,下角标,,
+}}}
+
+
+== 5.2. 链接 ==
+
+wiki内链接：
+
+{{{
+[[link]]	--- 简单链接
+[[link|description]]	--- 带有描述的链接
+[[subdir/project]]	--- 子目录链接
+[[../index]]	--- 返回主索引文(相对路径)
+[[/index]]	--- 返回主索引文件(绝对路径：wiki目录视为根目录)
+}}}
+
+
+wiki间链接：
+
+日记链接：
+
+锚点：
+
+原始统一资源标识符URLS：
+
+外部文件：
+
+== 5.3. 标题 ==
+
+== 5.4. 段落 ==
+
+== 5.5. 列表 ==
+
+== 5.6. 表格 ==
+
+== 5.7. 预格式化文本 ==
+
+== 5.8. 数学公式 ==
+
+== 5.9. 引用 ==
+
+== 5.10. 注释 ==
+
+== 5.11. 水平线 ==
+
+== 5.12. 标签 ==
+
+
+
+= 6. 折叠 大纲 =
+
+Vimwiki可以根据标题和预格式化块来折叠或显示大纲。另外也可以折叠列表子项目。
+折叠默认关闭，需要设置`g:vimwiki_folding`
+
+如果`g:vimwiki_folding='list'`，则：
+
+{{{
+zM --- 折叠当前列表项目及其子项目
+zr --- 每执行一次，展开一层，直至展开所有子项目
+}}}
+
+
+
+= 7. 占位符 =
+
+* `%title` Title of the page	--- 页面标题
+* `%nohtml`	--- 禁止wiki文件转化成HTML
+* `%template name`	--- 将已有HTML模板应用到wiki页面，参见`vimwiki-option-template_path`
+* `%date [2017-07-08]`	--- wiki文件日期，该值可用于HTML模板，省略参数则使用转化日期，详见`vimwiki-option-template_path`
+
+
+= 8. 列表 =
+
+
+
+= 9. 表格 =
+
+使用`:VimwikiTable`命令创建一个2行5列的表格
+
+{{{
+ |   |   |   |   |   |
+ |---|---|---|---|---|
+ |   |   |   |   |   |
+}}}
+
+插入模式按`<CR>`/`<Tab>`可一次编辑单元格，推出插入模式时，表格自动对齐
+
+如果想要缩进表格，只需缩进第一行，然后使用`gqq/gww`对齐表格
+
+当在Normal模式修改表格后，也可以使用`gqq`/`gww`对齐表格
+
+
+= 10. 日记 =
+
+日记功能可帮助你记录日常笔记，你能够非常容易地将分类的日记添加至Vimwiki中，
+只要按下`\w\w`，即可以当前的日期为名来创建新的笔记，
+这个新创建的笔记文件，会保存在diary目录中。
+
+当在日记索引文件中时，使用`:VimwikiDiaryGenerateLinks` or `\w\i` 更新日记索引，
+内容如下:
+
+{{{
+= Diary =
+
+== 2011 ==
+
+=== December ===
+    * [[2011-12-09]]
+    * [[2011-12-08]]
+}}}
+
+
+如果想要修改月份的显示形式，参考`g:vimwiki_diary_months`
+
+日历集成：
+
+如果你安装了`Calendar.vim`插件，就可以利用该插件创建日记，
+使用命令`:Calendar`，并在相应的日期上敲击`<CR>`即可创建日记。
+
+获取地址：`http://www.vim.org/scripts/script.php?script_id=52`
+
+相应的github地址：`https://github.com/mattn/calendar-vim`
+
+可以使用`g:vimwiki_use_calendar`开关日历的使用
+
+= 11. 锚点 =
+
+== 11.1 文件之间跳转 ==
+
+每个 标题，标签，粗体文本 都可以作为锚点，跳转到锚点的使用格式是:
+
+{{{
+	[[file#anchor]]
+}}}
+
+例如`Todo.wiki`文件有以下内容：
+
+{{{
+  = My tasks =
+  :todo-lists:
+  == Home ==
+    - [ ] bathe my dog
+  == Work ==
+    - [ ] beg for *pay rise*
+  == Knitting club ==
+  === Knitting projects ===
+    - [ ] a *funny pig*
+    - [ ] a *scary dog*
+}}}
+
+如果想从`index.wiki`文件直接跳到`Knitting projects`，可以使用：
+
+{{{
+	[[Todo#Knitting projects]]
+}}}
+
+也可利用粗体字跳转到列表项目：
+
+{{{
+	[[Todo#funny pig]]
+}}}
+
+也可直接跳到标签：
+
+{{{
+	[[Todo#todo-lists]]
+}}}
+
+如果文件中有多个名字/属性都相同的锚点，
+可以使用由层级标题组成的长格式引导到目的锚点，标题之间用`#`分开：
+
+{{{
+	[[Todo#My tasks#Knitting club#Knitting projects#scary dog]]
+}}}
+
+如果你不想逐个输入，可以在写完`[[Todo#`后按`<C-X><C-O>`，
+会自动列出所有可选锚点。
+
+单个文件之间的跳转，可以省略文件字段，如：
+
+{{{
+	[[#pay rise]]
+}}}
+
+	
+
+== 11.2 文件目录 ==
+
+`%toc`占位符已经弃用，可以使用`:VimwikiTOC`命令自动在文件顶部生成目录，
+也可在文件任何位置写如下内容：
+
+{{{
+= Contents =
+}}}
+
+然后执行`:VimwikiTOC`命令更新目录，如果设置了`vimwiki-option-auto_toc=1`，
+则会自动更新
+
+如果不想目录显示成Contents，可以通过`g:vimwiki_toc_header`设置成想要的文字内容
+
+另外可以利用tagbar插件显示侧边栏目录
+
+Tagbar插件：http://majutsushi.github.io/tagbar/
+
+然后下载https://raw.githubusercontent.com/vimwiki/utils/master/vwtags.py
+
+根据文件中的指示完成配置即可。
+
+
+
+= 12. 选项 =
+
+
+
+= 13. 开发者 =
+
